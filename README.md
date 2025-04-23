@@ -62,3 +62,5 @@ You can see the full list of commands in each of the `package.json` files in the
 👉 **[Visit the StellarRent GitBook Now!](https://renzos-organization-1.gitbook.io/stellar-rent)**
 
 Let’s build a fairer, more efficient rental ecosystem together—powered by Stellar! 🌟
+
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Stellar-Rent/stellar-rent?utm_source=oss&utm_medium=github&utm_campaign=Stellar-Rent%2Fstellar-rent&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
