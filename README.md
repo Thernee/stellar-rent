@@ -52,6 +52,16 @@ bun run init # bun install && bun husky:prepare
 ```bash
 # web app
 cd apps/web
+bun install
+bun dev
+
+# ...
+```
+---
+```bash
+# web app
+cd apps/backend
+bun install
 bun dev
 
 # ...
