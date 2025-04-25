@@ -69,7 +69,7 @@ bun dev
 
 You can see the full list of commands in each of the `package.json` files in the `apps` and `services` directories.
 
-👉 **[Visit the StellarRent GitBook Now!](https://renzos-organization-1.gitbook.io/stellar-rent)**
+👉 **[Visit the StellarRent GitBook Now!](https://stellar-rent.gitbook.io/stellar-rent)**
 
 Let’s build a fairer, more efficient rental ecosystem together—powered by Stellar! 🌟
 
