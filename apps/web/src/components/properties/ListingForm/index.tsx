@@ -1,24 +1,212 @@
 'use client';
 import * as Form from '@radix-ui/react-form';
 import type React from 'react';
+import useListingForm from '~/hooks/use-listing-form';
 import { createListing } from '~/services/propertyService';
-import useListingForm from './hooks';
 import { helpTextClass, inputClass, labelClass, sectionClass } from './styles';
-import type { ListingFormValues } from './types';
+import type { Address, Coordinates, ListingFormValues } from './types';
+const LocationPicker: React.FC<{
+  value: Coordinates;
+  onChange: (coords: Coordinates) => void;
+}> = ({ value, onChange }) => {
+  const handleMapClick = () => {
+    // In a real implementation, this would get coordinates from a map click
+    // For now, we'll use dummy coordinates
+    onChange({ lat: 37.7749, lng: -122.4194 });
+  };
 
-// Placeholders
-const LocationPicker = () => (
-  <div className="text-gray-400">[Location Picker Placeholder]</div>
-);
-const AddressFields = () => (
-  <div className="text-gray-400">[Address Fields Placeholder]</div>
-);
-const AmenitiesSelector = () => (
-  <div className="text-gray-400">[Amenities Selector Placeholder]</div>
-);
-const PhotoUploader = () => (
-  <div className="text-gray-400">[Photo Uploader Placeholder]</div>
-);
+  return (
+    <div className="mb-4">
+      <div
+        className="h-48 bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
+        onClick={handleMapClick}
+        onKeyDown={(e) => e.key === 'Enter' && handleMapClick()}
+      >
+        {value.lat && value.lng ? (
+          <span className="text-sm text-gray-600">
+            Selected: {value.lat.toFixed(4)}, {value.lng.toFixed(4)}
+          </span>
+        ) : (
+          <span className="text-sm text-gray-500">
+            Click to select location
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const AddressFields: React.FC<{
+  value: Address;
+  onChange: (address: Address) => void;
+}> = ({ value, onChange }) => {
+  const handleChange =
+    (field: keyof Address) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({ ...value, [field]: e.target.value });
+    };
+
+  return (
+    <div className="space-y-4">
+      <Form.Field name="street">
+        <Form.Label className={labelClass}>Street Address</Form.Label>
+        <Form.Control asChild>
+          <input
+            type="text"
+            className={inputClass}
+            value={value.street}
+            onChange={handleChange('street')}
+          />
+        </Form.Control>
+      </Form.Field>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Form.Field name="city">
+          <Form.Label className={labelClass}>City</Form.Label>
+          <Form.Control asChild>
+            <input
+              type="text"
+              className={inputClass}
+              value={value.city}
+              onChange={handleChange('city')}
+            />
+          </Form.Control>
+        </Form.Field>
+
+        <Form.Field name="state">
+          <Form.Label className={labelClass}>State</Form.Label>
+          <Form.Control asChild>
+            <input
+              type="text"
+              className={inputClass}
+              value={value.state}
+              onChange={handleChange('state')}
+            />
+          </Form.Control>
+        </Form.Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Form.Field name="postalCode">
+          <Form.Label className={labelClass}>Postal Code</Form.Label>
+          <Form.Control asChild>
+            <input
+              type="text"
+              className={inputClass}
+              value={value.postalCode}
+              onChange={handleChange('postalCode')}
+            />
+          </Form.Control>
+        </Form.Field>
+
+        <Form.Field name="country">
+          <Form.Label className={labelClass}>Country</Form.Label>
+          <Form.Control asChild>
+            <input
+              type="text"
+              className={inputClass}
+              value={value.country}
+              onChange={handleChange('country')}
+            />
+          </Form.Control>
+        </Form.Field>
+      </div>
+    </div>
+  );
+};
+
+const AmenitiesSelector: React.FC<{
+  value: string[];
+  onChange: (amenities: string[]) => void;
+}> = ({ value, onChange }) => {
+  const commonAmenities = [
+    'WiFi',
+    'Kitchen',
+    'Washer',
+    'Dryer',
+    'Air Conditioning',
+    'Heating',
+    'TV',
+    'Pool',
+    'Gym',
+    'Parking',
+  ];
+
+  const toggleAmenity = (amenity: string) => {
+    if (value.includes(amenity)) {
+      onChange(value.filter((a) => a !== amenity));
+    } else {
+      onChange([...value, amenity]);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {commonAmenities.map((amenity) => (
+        <label
+          key={amenity}
+          className="flex items-center space-x-2 cursor-pointer"
+        >
+          <input
+            type="checkbox"
+            checked={value.includes(amenity)}
+            onChange={() => toggleAmenity(amenity)}
+            className="rounded text-primary focus:ring-primary"
+          />
+          <span className="text-gray-700">{amenity}</span>
+        </label>
+      ))}
+    </div>
+  );
+};
+
+const PhotoUploader: React.FC<{
+  value: (File | string)[];
+  onChange: (photos: (File | string)[]) => void;
+}> = ({ value, onChange }) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    onChange([...value, ...files]);
+  };
+
+  const removePhoto = (index: number) => {
+    onChange(value.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-4">
+        {value.map((photo, index) => (
+          <div
+            key={typeof photo === 'string' ? photo : URL.createObjectURL(photo)}
+            className="relative group"
+          >
+            <img
+              src={
+                typeof photo === 'string' ? photo : URL.createObjectURL(photo)
+              }
+              alt={`Property ${index + 1}`}
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <button
+              type="button"
+              onClick={() => removePhoto(index)}
+              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileChange}
+        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
+      />
+    </div>
+  );
+};
 
 const ListingSection: React.FC<{
   title: string;
@@ -31,9 +219,21 @@ const ListingSection: React.FC<{
 );
 
 const ListingForm: React.FC = () => {
-  const { register, handleSubmit, formState } = useListingForm();
+  const { register, handleSubmit, formState, setValue, watch } =
+    useListingForm();
+  const location = watch('location') || { lat: 0, lng: 0 };
+  const address = watch('address') || {
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
+  };
+  const amenities = watch('amenities') || [];
+  const photos = watch('photos') || [];
 
   const onSubmit = async (data: ListingFormValues) => {
+    console.log(data);
     await createListing(data);
   };
 
@@ -85,16 +285,28 @@ const ListingForm: React.FC = () => {
       </Form.Field>
 
       <ListingSection title="Location">
-        <LocationPicker />
-        <AddressFields />
+        <LocationPicker
+          value={location}
+          onChange={(coords) => setValue('location', coords)}
+        />
+        <AddressFields
+          value={address}
+          onChange={(addr) => setValue('address', addr)}
+        />
       </ListingSection>
 
       <ListingSection title="Amenities">
-        <AmenitiesSelector />
+        <AmenitiesSelector
+          value={amenities}
+          onChange={(items) => setValue('amenities', items)}
+        />
       </ListingSection>
 
       <ListingSection title="Photos">
-        <PhotoUploader />
+        <PhotoUploader
+          value={photos}
+          onChange={(items) => setValue('photos', items)}
+        />
       </ListingSection>
 
       <Form.Submit asChild>
