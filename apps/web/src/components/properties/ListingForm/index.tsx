@@ -1,4 +1,5 @@
 'use client';
+import * as Form from '@radix-ui/react-form';
 import type React from 'react';
 import { createListing } from '~/services/propertyService';
 import useListingForm from './hooks';
@@ -37,64 +38,51 @@ const ListingForm: React.FC = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-xl mx-auto p-4 space-y-6"
-    >
-      {/* Progress bar */}
-      <div className="h-2 bg-gray-200 rounded mb-6">
-        <div
-          className="h-full bg-primary rounded transition-all"
-          style={{ width: '25%' }}
-        />
-      </div>
-
-      <ListingSection title="Basic Information">
-        <label className={labelClass} htmlFor="title">
-          Property Title
-        </label>
-        <input id="title" {...register('title')} className={inputClass} />
-        <div className={helpTextClass}>
-          Enter a descriptive title for your property.
-        </div>
+    <Form.Root onSubmit={handleSubmit(onSubmit)}>
+      <Form.Field name="title">
+        <Form.Label className={labelClass}>Title</Form.Label>
+        <Form.Control asChild>
+          <input id="title" className={inputClass} {...register('title')} />
+        </Form.Control>
         {formState.errors.title && (
-          <div className="text-red-500 text-xs">
+          <Form.Message className={helpTextClass}>
             {formState.errors.title.message}
-          </div>
+          </Form.Message>
         )}
+      </Form.Field>
 
-        <label className={labelClass} htmlFor="description">
-          Description
-        </label>
-        <textarea
-          id="description"
-          {...register('description')}
-          className={inputClass}
-          rows={4}
-        />
-        <div className={helpTextClass}>Describe your property in detail.</div>
+      <Form.Field name="description">
+        <Form.Label className={labelClass}>Description</Form.Label>
+        <Form.Control asChild>
+          <textarea
+            id="description"
+            className={inputClass}
+            {...register('description')}
+          />
+        </Form.Control>
         {formState.errors.description && (
-          <div className="text-red-500 text-xs">
+          <Form.Message className={helpTextClass}>
             {formState.errors.description.message}
-          </div>
+          </Form.Message>
         )}
+      </Form.Field>
 
-        <label className={labelClass} htmlFor="price">
-          Price per Night
-        </label>
-        <input
-          id="price"
-          type="number"
-          {...register('price', { valueAsNumber: true })}
-          className={inputClass}
-        />
-        <div className={helpTextClass}>Set a nightly price (USD).</div>
+      <Form.Field name="price">
+        <Form.Label className={labelClass}>Price per Night</Form.Label>
+        <Form.Control asChild>
+          <input
+            id="price"
+            type="number"
+            className={inputClass}
+            {...register('price', { valueAsNumber: true })}
+          />
+        </Form.Control>
         {formState.errors.price && (
-          <div className="text-red-500 text-xs">
+          <Form.Message className={helpTextClass}>
             {formState.errors.price.message}
-          </div>
+          </Form.Message>
         )}
-      </ListingSection>
+      </Form.Field>
 
       <ListingSection title="Location">
         <LocationPicker />
@@ -109,14 +97,16 @@ const ListingForm: React.FC = () => {
         <PhotoUploader />
       </ListingSection>
 
-      <button
-        type="submit"
-        className="w-full py-2 px-4 bg-primary text-white font-semibold rounded hover:bg-primary-dark transition"
-        disabled={formState.isSubmitting}
-      >
-        {formState.isSubmitting ? 'Submitting...' : 'List Property'}
-      </button>
-    </form>
+      <Form.Submit asChild>
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-primary text-white font-semibold rounded hover:bg-primary-dark transition"
+          disabled={formState.isSubmitting}
+        >
+          {formState.isSubmitting ? 'Submitting...' : 'List Property'}
+        </button>
+      </Form.Submit>
+    </Form.Root>
   );
 };
 
