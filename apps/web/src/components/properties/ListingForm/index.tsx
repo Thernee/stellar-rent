@@ -1,7 +1,9 @@
 'use client';
 import type React from 'react';
+import { createListing } from '~/services/propertyService';
 import useListingForm from './hooks';
 import { helpTextClass, inputClass, labelClass, sectionClass } from './styles';
+import type { ListingFormValues } from './types';
 
 // Placeholders
 const LocationPicker = () => (
@@ -30,8 +32,8 @@ const ListingSection: React.FC<{
 const ListingForm: React.FC = () => {
   const { register, handleSubmit, formState } = useListingForm();
 
-  const onSubmit = (data: unknown) => {
-    alert(JSON.stringify(data, null, 2));
+  const onSubmit = async (data: ListingFormValues) => {
+    await createListing(data);
   };
 
   return (
