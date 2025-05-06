@@ -13,4 +13,17 @@ export const listingSchema = z.object({
     .number()
     .min(1, 'Price must be greater than 0')
     .max(10000, 'Price cannot exceed 10000'),
+  location: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  address: z.object({
+    street: z.string(),
+    city: z.string(),
+    state: z.string(),
+    postalCode: z.string(),
+    country: z.string(),
+  }),
+  amenities: z.string().array(),
+  photos: z.any().array(),
 });

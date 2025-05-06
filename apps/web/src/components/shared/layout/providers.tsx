@@ -3,8 +3,8 @@
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
 import React from 'react';
+import { AuthProvider } from '~/hooks/auth/use-auth';
 import { StellarProvider } from '~/hooks/stellar/stellar-context';
-import { AuthProvider } from '~/hooks/use-auth';
 
 const ThemeProvider = dynamic(
   () => import('next-themes').then((mod) => ({ default: mod.ThemeProvider })),
