@@ -5,22 +5,27 @@ import useListingForm from '~/hooks/use-listing-form';
 import { createListing } from '~/services/propertyService';
 import { helpTextClass, inputClass, labelClass, sectionClass } from './styles';
 import type { Address, Coordinates, ListingFormValues } from './types';
+
 const LocationPicker: React.FC<{
   value: Coordinates;
   onChange: (coords: Coordinates) => void;
 }> = ({ value, onChange }) => {
   const handleMapClick = () => {
-    // In a real implementation, this would get coordinates from a map click
-    // For now, we'll use dummy coordinates
     onChange({ lat: 37.7749, lng: -122.4194 });
   };
 
   return (
     <div className="mb-4">
       <div
-        className="h-48 bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
+        aria-label="Select location on map"
+        className="h-48 bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center focus:ring-2 focus:ring-primary focus:outline-none"
         onClick={handleMapClick}
-        onKeyDown={(e) => e.key === 'Enter' && handleMapClick()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleMapClick();
+          }
+        }}
       >
         {value.lat && value.lng ? (
           <span className="text-sm text-gray-600">
@@ -28,7 +33,7 @@ const LocationPicker: React.FC<{
           </span>
         ) : (
           <span className="text-sm text-gray-500">
-            Click to select location
+            Click or press Enter to select location
           </span>
         )}
       </div>
@@ -140,17 +145,27 @@ const AmenitiesSelector: React.FC<{
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4" aria-labelledby="amenities-group">
+      <h3 id="amenities-group" className="sr-only">
+        Available Amenities
+      </h3>
       {commonAmenities.map((amenity) => (
         <label
           key={amenity}
-          className="flex items-center space-x-2 cursor-pointer"
+          className="flex items-center space-x-2 cursor-pointer focus-within:ring-2 focus-within:ring-primary focus-within:outline-none p-2 rounded"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleAmenity(amenity);
+            }
+          }}
         >
           <input
             type="checkbox"
             checked={value.includes(amenity)}
             onChange={() => toggleAmenity(amenity)}
             className="rounded text-primary focus:ring-primary"
+            aria-label={`Select ${amenity} amenity`}
           />
           <span className="text-gray-700">{amenity}</span>
         </label>
@@ -173,7 +188,10 @@ const PhotoUploader: React.FC<{
   };
 
   return (
-    <div className="space-y-4">
+    <fieldset className="space-y-4" aria-labelledby="photo-uploader">
+      <h3 id="photo-uploader" className="sr-only">
+        Photo Upload Section
+      </h3>
       <div className="grid grid-cols-3 gap-4">
         {value.map((photo, index) => (
           <div
@@ -190,21 +208,26 @@ const PhotoUploader: React.FC<{
             <button
               type="button"
               onClick={() => removePhoto(index)}
-              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition focus:opacity-100 focus:ring-2 focus:ring-primary focus:outline-none"
+              aria-label={`Remove photo ${index + 1}`}
             >
               ×
             </button>
           </div>
         ))}
       </div>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={handleFileChange}
-        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
-      />
-    </div>
+      <label className="block w-full text-sm text-gray-500">
+        <span className="sr-only">Upload photos</span>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark focus:ring-2 focus:ring-primary focus:outline-none"
+          aria-label="Upload property photos"
+        />
+      </label>
+    </fieldset>
   );
 };
 
@@ -242,7 +265,12 @@ const ListingForm: React.FC = () => {
       <Form.Field name="title">
         <Form.Label className={labelClass}>Title</Form.Label>
         <Form.Control asChild>
-          <input id="title" className={inputClass} {...register('title')} />
+          <input
+            id="title"
+            className={`${inputClass} focus:ring-2 focus:ring-primary focus:outline-none`}
+            {...register('title')}
+            aria-required="true"
+          />
         </Form.Control>
         {formState.errors.title && (
           <Form.Message className={helpTextClass}>
@@ -256,8 +284,9 @@ const ListingForm: React.FC = () => {
         <Form.Control asChild>
           <textarea
             id="description"
-            className={inputClass}
+            className={`${inputClass} focus:ring-2 focus:ring-primary focus:outline-none`}
             {...register('description')}
+            aria-required="true"
           />
         </Form.Control>
         {formState.errors.description && (
@@ -273,8 +302,9 @@ const ListingForm: React.FC = () => {
           <input
             id="price"
             type="number"
-            className={inputClass}
+            className={`${inputClass} focus:ring-2 focus:ring-primary focus:outline-none`}
             {...register('price', { valueAsNumber: true })}
+            aria-required="true"
           />
         </Form.Control>
         {formState.errors.price && (
@@ -312,8 +342,9 @@ const ListingForm: React.FC = () => {
       <Form.Submit asChild>
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-primary text-white font-semibold rounded hover:bg-primary-dark transition"
+          className="w-full py-2 px-4 bg-primary text-white font-semibold rounded hover:bg-primary-dark transition focus:ring-2 focus:ring-primary focus:outline-none"
           disabled={formState.isSubmitting}
+          aria-busy={formState.isSubmitting}
         >
           {formState.isSubmitting ? 'Submitting...' : 'List Property'}
         </button>
