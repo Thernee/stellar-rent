@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import type { ListingFormValues } from '~/components/properties/ListingForm/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -13,7 +14,10 @@ export const createListing = async (
   data: ListingFormValues
 ): Promise<unknown> => {
   const token = getAuthToken();
-  if (!token) throw new Error('Authentication token not found.');
+  if (!token) {
+    toast.error('Authentication token not found.');
+    throw new Error('Authentication token not found.');
+  }
 
   try {
     const response = await fetch(`${API_URL}/properties`, {
@@ -29,14 +33,20 @@ export const createListing = async (
       const errorResponse = await response.json().catch(() => ({
         message: 'An unknown error occurred.',
       }));
+      toast.error(errorResponse.message || 'Failed to create listing.');
       throw new Error(errorResponse.message || 'Failed to create listing.');
     }
-    return await response.json();
+
+    const result = await response.json();
+    toast.success('Listing created successfully!');
+    return result;
   } catch (err) {
     if (err instanceof Error) {
       console.error('Network or server error:', err.message);
+      toast.error(`Request failed: ${err.message}`);
       throw new Error(`Request failed: ${err.message}`);
     }
+    toast.error('An unexpected error occurred.');
     throw new Error('An unexpected error occurred.');
   }
 };

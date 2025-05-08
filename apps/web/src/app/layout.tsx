@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 import { Navbar } from '~/components/layout/Navbar';
 import { Providers } from '~/components/shared/layout/providers';
 
@@ -30,6 +31,7 @@ export default function RootLayout({
           <main className="flex-1 flex flex-col items-center justify-between p-2">
             {children}
           </main>
+          <Toaster position="top-right" />
         </Providers>
       </body>
     </html>
