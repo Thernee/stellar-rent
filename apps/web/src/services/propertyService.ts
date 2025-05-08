@@ -16,7 +16,7 @@ export const createListing = async (
   const token = getAuthToken();
   if (!token) {
     toast.error('Authentication token not found.');
-    throw new Error('Authentication token not found.');
+    return;
   }
 
   try {
@@ -34,7 +34,7 @@ export const createListing = async (
         message: 'An unknown error occurred.',
       }));
       toast.error(errorResponse.message || 'Failed to create listing.');
-      throw new Error(errorResponse.message || 'Failed to create listing.');
+      return;
     }
 
     const result = await response.json();
@@ -42,7 +42,6 @@ export const createListing = async (
     return result;
   } catch (err) {
     if (err instanceof Error) {
-      console.error('Network or server error:', err.message);
       toast.error(`Request failed: ${err.message}`);
       throw new Error(`Request failed: ${err.message}`);
     }
