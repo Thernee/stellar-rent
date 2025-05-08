@@ -2,7 +2,7 @@
 import React from 'react';
 import ListingForm from '~/components/properties/ListingForm';
 import { useAuthGuard } from '~/hooks/auth/use-auth-guard';
-const page = () => {
+const Page = () => {
   const { isLoading } = useAuthGuard();
   if (isLoading)
     return <div>Please wait... checking authentication status</div>;
@@ -13,4 +13,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
