@@ -217,4 +217,4 @@ _Note: In the current contract, this is a stub and returns an empty array. You c
 
 ---
 
-**Let's build a fairer, more efficient rental ecosystem together—powered by Stellar! 🌟**
+**Let's build a fairer, more efficient rental ecosystem together! 🌟**
