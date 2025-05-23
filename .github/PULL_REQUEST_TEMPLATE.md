@@ -1,4 +1,4 @@
-<p align="center"> <img src="../assets/stellarrentlogo.png" alt="StellarRent Logo" width="200"> </p>
+<p align="center"> <img src="https://raw.githubusercontent.com/Stellar-Rent/stellar-rent/main/assets/stellarrentlogo.png" alt="StellarRent Logo" width="200"> </p>
 
 ## Pull Request | StellarRent
 
