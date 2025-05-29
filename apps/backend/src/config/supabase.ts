@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-//AvaialbilityRange and CancellationPolicy interfaces for properties table
+//AvailabilityRangee and CancellationPolicy interfaces for properties table
 export interface AvailabilityRange {
   start: string;
   end: string;
