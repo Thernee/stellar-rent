@@ -1,5 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
+//AvaialbilityRange and CancellationPolicy interfaces for properties table
+export interface AvailabilityRange {
+  start: string;
+  end: string;
+}
+
+export interface CancellationPolicy {
+  refundable_until_days: number;
+  refund_percentage: number;
+}
+
 // Define your database types
 export type Database = {
   public: {
@@ -22,6 +33,58 @@ export type Database = {
           name?: string;
           password_hash?: string;
         };
+      };
+
+      properties: {
+        Row: {
+          id: string;
+          title: string;
+          description: string;
+          price: number;
+          address: string;
+          city: string;
+          country: string;
+          latitude: number | null;
+          longitude: number | null;
+          amenities: string[];
+          images: string[];
+          bedrooms: number;
+          bathrooms: number;
+          max_guests: number;
+          owner_id: string;
+          status: 'available' | 'booked' | 'maintenance';
+          availability: AvailabilityRange[];
+          security_deposit: number;
+          cancellation_policy: CancellationPolicy | null;
+          property_token: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description: string;
+          price: number;
+          address: string;
+          city: string;
+          country: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          amenities?: string[];
+          images?: string[];
+          bedrooms: number;
+          bathrooms: number;
+          max_guests: number;
+          owner_id: string;
+          status?: 'available' | 'booked' | 'maintenance';
+          availability?: AvailabilityRange[];
+          security_deposit?: number;
+          cancellation_policy?: CancellationPolicy | null;
+          property_token?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['properties']['Insert']>;
       };
     };
   };
