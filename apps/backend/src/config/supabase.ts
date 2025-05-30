@@ -1,15 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-
-//AvailabilityRangee and CancellationPolicy interfaces for properties table
-export interface AvailabilityRange {
-  start: string;
-  end: string;
-}
-
-export interface CancellationPolicy {
-  refundable_until_days: number;
-  refund_percentage: number;
-}
+import type { AvailabilityRange, CancellationPolicy } from '../types/properties.types';
 
 // Define your database types
 export type Database = {
