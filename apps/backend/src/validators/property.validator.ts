@@ -1,35 +1,35 @@
-import type { RequestHandler } from 'express';
-import multer from 'multer';
+import type { NextFunction, Request, Response } from 'express';
+import { z } from 'zod';
 
-// Multer configuration
-const storage = multer.memoryStorage();
-export const upload = multer({
-  storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-    files: 10,
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  },
+const propertyIdSchema = z.object({
+  id: z.string().uuid('Invalid property ID format'),
 });
 
-// Image processing middleware
-export const processImageUploads: RequestHandler = (req, res, next) => {
-  if (!req.files || req.files.length === 0) return next();
+const ownerIdSchema = z.object({
+  ownerId: z.string().uuid('Invalid owner ID format'),
+});
 
-  const images = (req.files as Express.Multer.File[]).map((file) => {
-    const base64 = file.buffer.toString('base64');
-    return `data:${file.mimetype};base64,${base64}`;
-  });
+/**
+ * Middleware to validate property ID in request parameters
+ */
+export function validatePropertyId(req: Request, res: Response, next: NextFunction): void {
+  try {
+    propertyIdSchema.parse(req.params);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
 
-  req.body.images = [...(req.body.images || []), ...images];
-  next();
-};
-
-export { validatePropertyId, validateOwnerId } from '../middleware/validation.middleware';
+/**
+ * Middleware to validate owner ID in request parameters
+ */
+export function validateOwnerId(req: Request, res: Response, next: NextFunction): void {
+  try {
+    ownerIdSchema.parse(req.params);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
 export { authenticateToken } from '../middleware/auth.middleware';
