@@ -10,10 +10,9 @@ import {
   updatePropertyController,
   updatePropertyStatusController,
 } from '../controllers/property.controller';
+import { processImageUploads, upload } from '../middleware/upload.middleware';
 import {
   authenticateToken,
-  processImageUploads,
-  upload,
   validateOwnerId,
   validatePropertyId,
 } from '../validators/property.validator';
