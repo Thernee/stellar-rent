@@ -45,7 +45,7 @@ export interface ServiceResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  details?: Record<string, unknown> | Error | null;
+  details?: unknown;
 }
 
 export interface PropertyListResponse {
