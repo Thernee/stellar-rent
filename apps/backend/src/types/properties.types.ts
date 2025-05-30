@@ -81,5 +81,24 @@ export const propertySchema = z.object({
   property_token: z.string().nullable().optional(),
 });
 
+export const searchPropertiesQuerySchema = z.object({
+  city: z.string().optional(),
+  country: z.string().optional(),
+  min_price: z.coerce.number().min(0).optional(),
+  max_price: z.coerce.number().min(0).optional(),
+  bedrooms: z.coerce.number().int().min(1).optional(),
+  bathrooms: z.coerce.number().int().min(1).optional(),
+  max_guests: z.coerce.number().int().min(1).optional(),
+  amenities: z
+    .string()
+    .transform((val) => val.split(','))
+    .optional(),
+  status: z.enum(['available', 'booked', 'maintenance']).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  sort_by: z.enum(['price', 'created_at', 'title']).default('created_at'),
+  sort_order: z.enum(['asc', 'desc']).default('desc'),
+});
+
 export const updatePropertySchema = propertySchema.partial();
 export type PropertyInput = z.infer<typeof propertySchema>;
