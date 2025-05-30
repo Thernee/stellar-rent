@@ -8,6 +8,15 @@ import authRoutes from './routes/auth';
 // Environment variables configuration
 dotenv.config();
 
+// Validate environment variables at startup to prevent runtime errors
+if (!process.env.JWT_SECRET) {
+  throw new Error('Missing JWT_SECRET environment variable');
+}
+
+if (!process.env.SUPABASE_URL) {
+  throw new Error('Missing SUPABASE_URL environment variable');
+}
+
 // Debug: verificar variables de entorno
 console.log('Variables de entorno cargadas:', {
   supabaseUrl: process.env.SUPABASE_URL ? '✅' : '❌',
