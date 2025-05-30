@@ -4,8 +4,8 @@ import type {
   CreatePropertyInput,
   Property,
   UpdatePropertyInput,
-} from '../types/properties.types';
-import { propertySchema, updatePropertySchema } from '../types/properties.types';
+} from '../types/property.types';
+import { propertySchema, updatePropertySchema } from '../types/property.types';
 
 // Allowed amenities list
 const ALLOWED_AMENITIES = [
