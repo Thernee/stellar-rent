@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { AvailabilityRange, CancellationPolicy } from '../types/properties.types';
+import type { AvailabilityRange, CancellationPolicy } from '../types/property.types';
 
 // Define your database types
 export type Database = {

@@ -13,13 +13,13 @@ import {
   updateProperty,
   updatePropertyAvailability,
   updatePropertyStatus,
-} from '../services/properties.service';
+} from '../services/property.service';
 import {
   availabilityRangeSchema,
   propertySchema,
   searchPropertiesQuerySchema,
   updatePropertySchema,
-} from '../types/properties.types';
+} from '../types/property.types';
 
 const createPropertyRequestSchema = propertySchema;
 
