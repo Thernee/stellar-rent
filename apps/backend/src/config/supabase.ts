@@ -23,6 +23,41 @@ export type Database = {
           password_hash?: string;
         };
       };
+      bookings: {
+        Row: {
+          id: string;
+          property_id: string;
+          user_id: string;
+          dates: { from: string; to: string };
+          guests: number;
+          total: string;
+          deposit: string;
+          status: string;
+          escrow_address: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          property_id: string;
+          user_id: string;
+          dates: { from: string; to: string };
+          guests: number;
+          total: string;
+          deposit: string;
+          status: string;
+          escrow_address: string;
+        };
+        Update: {
+          property_id?: string;
+          user_id?: string;
+          dates?: { from: string; to: string };
+          guests?: number;
+          total?: string;
+          deposit?: string;
+          status?: string;
+          escrow_address?: string;
+        };
+      };
     };
   };
 };
