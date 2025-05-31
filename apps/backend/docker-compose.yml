@@ -27,7 +27,7 @@ services:
       - /app/node_modules  # Prevent overwriting node_modules
       - /app/dist          # Prevent overwriting dist
     working_dir: /app
-    command: ["npm", "run", "dev"]
+    command: ["bun", "run", "dev"]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/", "||", "exit", "1"]

@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for StellarRent Backend
-# Use official Node.js LTS image as base for minimal size
-FROM node:20-alpine AS base
+# Use official Bun image as base for minimal size
+FROM oven/bun:1.1.29-alpine AS base
 
 # Set working directory
 WORKDIR /app
@@ -19,11 +19,11 @@ RUN addgroup -g 1001 -S nodejs && \
 # Stage 2: Dependencies installation
 FROM base AS deps
 
-# Copy package.json and package-lock.json (if exists)
-COPY package.json package-lock.json* ./
+# Copy package.json and bun.lockb (if exists)
+COPY package.json bun.lockb* ./
 
 # Install dependencies
-RUN if [ -f package-lock.json ]; then npm ci --only=production; else npm install --only=production; fi && npm cache clean --force
+RUN bun install --frozen-lockfile --production
 
 # Stage 3: Build stage
 FROM base AS builder
@@ -36,7 +36,7 @@ COPY package.json ./
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN bun run build
 
 # Stage 4: Production image
 FROM base AS runner
@@ -58,7 +58,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node --version || exit 1
+    CMD bun --version || exit 1
 
 # Set the default command to start the backend in production mode
-CMD ["npm", "run", "start"]
+CMD ["bun", "run", "start"]
