@@ -1,83 +1,50 @@
-# StellarRent Backend
+# 🚀 StellarRent Backend
 
-Backend for the StellarRent application built with Bun, Express.js, TypeScript, and Supabase.
-
-## 🚀 Features
-
-- 🔐 JWT Authentication with Supabase
-- 🛡️ Rate limiting and security middleware
-- 🗄️ Supabase integration for database operations
-- 📝 Request validation with Zod
-- 🔒 Comprehensive security middleware
-- 🐳 Docker support for development and production
-- 🔄 Hot-reloading in development
-- 📊 Health checks and monitoring
-- 🧪 Comprehensive testing setup
-
-## 🛠️ Tech Stack
-
-- **Runtime**: Bun (JavaScript runtime)
-- **Framework**: Express.js
-- **Language**: TypeScript
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: JWT + Supabase Auth
-- **Validation**: Zod
-- **Containerization**: Docker & Docker Compose
-- **Testing**: Bun Test
+Backend API for StellarRent, built with Express, TypeScript and Supabase.
 
 ## 📋 Prerequisites
 
-- [Bun](https://bun.sh/) (version 1.0 or higher)
-- [Docker](https://docs.docker.com/get-docker/) (optional, for containerized development)
-- [Supabase Account](https://supabase.com/)
+- **Node.js** (v18+)
+- **Bun** (install with `curl -fsSL https://bun.sh/install | bash`)
+- **Supabase account** and project created
 
-## 🚀 Quick Start
+## 🛠️ Complete Setup
 
-### Local Development (without Docker)
+### 1. Install Dependencies
+```bash
+cd apps/backend
+bun install
+```
 
-1. **Install dependencies:**
-   ```bash
-   bun install
-   ```
+### 2. 🗄️ Database Setup
+**IMPORTANT**: Configure the database BEFORE continuing.
 
-2. **Set up environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your actual Supabase credentials
-   ```
+1. Go to your Supabase dashboard
+2. Open the **SQL Editor**
+3. Execute the complete script: [`database/setup.sql`](./database/setup.sql)
 
-3. **Create the users table in Supabase:**
-   ```sql
-   CREATE TABLE users (
-     id SERIAL PRIMARY KEY,
-     email VARCHAR UNIQUE NOT NULL,
-     password VARCHAR NOT NULL,
-     name VARCHAR NOT NULL,
-     created_at TIMESTAMP DEFAULT NOW()
-   );
-   ```
+📖 **Detailed guide**: [`database/README.md`](./database/README.md)
 
-4. **Start development server:**
-   ```bash
-   bun dev
-   ```
+### 3. Environment Variables
+Create `.env` in `apps/backend/`:
 
-   The server will start at `http://localhost:3000` with hot-reloading enabled.
+```env
+PORT=3000
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+JWT_SECRET=your_super_secure_jwt_secret
+CORS_ORIGIN=http://localhost:3000
+```
 
-### Docker Development
+> 💡 **Tip**: Find your keys in Supabase → Settings → API
 
-1. **Set up environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your actual values
-   ```
+### 4. Run Server
+```bash
+bun run dev
+```
 
-2. **Start with Docker Compose:**
-   ```bash
-   bun run docker:dev
-   ```
-
-   This will start the backend with Redis caching at `http://localhost:3000`.
+API running at **http://localhost:3000** 🎉
 
 ## 🐳 Docker Commands
 
@@ -102,75 +69,167 @@ Backend for the StellarRent application built with Bun, Express.js, TypeScript, 
 | `bun test` | Run test suite |
 | `bun run docker:*` | Docker-related commands |
 
-## 🌐 API Endpoints
+## 🧪 Testing
 
-### Authentication
+### Quick Test
+```bash
+# Test basic endpoint
+curl http://localhost:3000/properties/amenities
 
-- **POST /auth/register**
-  - Request: `{"email": "user@example.com", "password": "secure123", "name": "John Doe"}`
-  - Success (201): `{"id": 1, "email": "user@example.com", "name": "John Doe"}`
-  - Errors: 400 (invalid input), 409 (email exists), 500 (server error)
+# Run test suite (if exists)
+bun test
+```
 
-- **POST /auth/login**
-  - Request: `{"email": "user@example.com", "password": "secure123"}`
-  - Success (200): `{"token": "jwt_token", "user": {...}}`
+### Test Script
+```bash
+chmod +x test_endpoints.sh
+./test_endpoints.sh
+```
+
+## 📡 API Endpoints
+
+### **🔓 Public Endpoints**
+```
+GET    /properties/amenities     # Get allowed amenities
+GET    /properties               # Search properties (with filters)
+GET    /properties/:id           # Get property by ID
+```
+
+### **🔐 Protected Endpoints** (require JWT)
+```
+POST   /properties               # Create new property
+PUT    /properties/:id           # Update property
+DELETE /properties/:id           # Delete property
+PATCH  /properties/:id/status    # Update status
+PATCH  /properties/:id/availability  # Update availability
+GET    /properties/owner/:ownerId    # Properties by owner
+```
+
+### **👤 Auth Endpoints**
+```
+POST   /auth/register            # Register user
+POST   /auth/login               # Login user
+```
+
+## 📝 Examples
+
+### Register User
+```bash
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
+```
+
+### Create Property
+```bash
+curl -X POST http://localhost:3000/properties \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Modern House",
+    "description": "Beautiful house in Buenos Aires",
+    "price": 150.00,
+    "address": "Av. Corrientes 1234",
+    "city": "Buenos Aires",
+    "country": "Argentina",
+    "amenities": ["wifi", "kitchen", "parking"],
+    "images": ["https://example.com/image1.jpg"],
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "max_guests": 6,
+    "owner_id": "your-user-uuid"
+  }'
+```
+
+### Search Properties
+```bash
+curl "http://localhost:3000/properties?city=Buenos%20Aires&min_price=100&max_price=200"
+```
 
 ## 🏗️ Project Structure
 
 ```
 apps/backend/
 ├── src/
-│   ├── config/         # Configuration files
-│   │   └── supabase.ts # Supabase client setup
-│   ├── controllers/    # Route controllers
-│   │   └── authController.ts
-│   ├── middleware/     # Express middleware
-│   │   ├── auth.middleware.ts
-│   │   ├── error.middleware.ts
-│   │   └── rateLimiter.ts
-│   ├── routes/         # API routes
-│   │   └── auth.ts
-│   ├── services/       # Business logic
-│   │   └── auth.service.ts
-│   ├── types/          # TypeScript type definitions
-│   │   └── auth.types.ts
-│   ├── validators/     # Request validators
-│   │   └── auth.validator.ts
-│   └── index.ts        # Application entry point
-├── tests/              # Test files
-│   └── docker.test.sh  # Docker testing script
-├── dist/               # Built files (generated)
-├── Dockerfile          # Docker configuration
-├── docker-compose.yml  # Development environment
-├── docker-compose.prod.yml # Production environment
-├── .env.example        # Environment variables template
-├── .dockerignore       # Docker ignore file
-├── redis.conf          # Redis configuration
-├── package.json        # Dependencies and scripts
-└── tsconfig.json       # TypeScript configuration
+│   ├── controllers/     # Request handlers
+│   ├── services/        # Business logic
+│   ├── routes/          # API routes
+│   ├── middleware/      # Auth, validation, etc.
+│   ├── types/           # TypeScript types
+│   ├── validators/      # Input validation
+│   └── config/          # Database, storage config
+├── database/
+│   ├── setup.sql        # Database setup script
+│   └── README.md        # Database documentation
+├── test_endpoints.sh    # Quick API testing
+└── package.json
 ```
+
+## 🛡️ Security Features
+
+- **JWT Authentication** for protected endpoints
+- **Input validation** with Zod schemas
+- **Row Level Security** in Supabase
+- **Rate limiting** to prevent abuse
+- **CORS** properly configured
+
+## 🔧 Development
+
+### Add New Endpoint
+1. Create controller in `src/controllers/`
+2. Add service logic in `src/services/`
+3. Define types in `src/types/`
+4. Add route in `src/routes/`
+5. Add validation if needed
+
+### Database Changes
+1. Update `database/setup.sql`
+2. Test in development
+3. Document changes in `database/README.md`
+
+## 🚨 Troubleshooting
+
+### **Server won't start**
+- ✅ Check environment variables in `.env`
+- ✅ Make sure Supabase is configured
+- ✅ Run `bun install` again
+
+### **Database errors**
+- ✅ Execute `database/setup.sql` in Supabase
+- ✅ Check SUPABASE_URL and keys
+- ✅ Confirm tables exist
+
+### **Auth not working**
+- ✅ Check JWT_SECRET in `.env`
+- ✅ Make sure token is valid
+- ✅ Verify RLS is configured
+
+### **Endpoints return 404**
+- ✅ Confirm server is running
+- ✅ Check URL and HTTP method
+- ✅ Review server logs
 
 ## 🤝 Contributing
 
-1. Branch from main: `git checkout -b feature/your-feature`
-2. Test changes and update docs if needed
-3. Submit a pull request to main
+1. **Fork** the repository
+2. **Create branch**: `git checkout -b feature/amazing-feature`
+3. **Test** your changes locally
+4. **Document** new endpoints/changes
+5. **Submit** pull request
 
-## 🔧 Environment Variables
+### Contribution Guidelines
+- ✅ Follow TypeScript best practices
+- ✅ Add tests for new functionality
+- ✅ Update documentation
+- ✅ Use conventional commits
 
-See `.env.example` for all required environment variables including:
-- Supabase credentials
-- JWT secret
-- Stellar network configuration
-- Redis configuration (for Docker)
+## 📚 Resources
 
-## 🧪 Testing
+- [Express.js Documentation](https://expressjs.com/)
+- [Supabase Documentation](https://supabase.com/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Zod Schema Validation](https://zod.dev/)
 
-Run the Docker test suite to verify your setup:
+---
 
-```bash
-cd apps/backend
-./tests/docker.test.sh
-```
-
-This will test Docker image building, container startup, API connectivity, and environment variable loading.
+**Need help?** Open an issue or check the database documentation at [`database/README.md`](./database/README.md) 🚀
