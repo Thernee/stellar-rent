@@ -149,49 +149,12 @@ const HostDashboard = () => {
     return matchesSearch && matchesFilter;
   });
 
-interface Property {
-    id: number;
-    title: string;
-    location: string;
-    price: number;
-    bedrooms: number;
-    bathrooms: number;
-    guests: number;
-    rating: number;
-    reviews: number;
-    image: string;
-    status: 'active' | 'inactive';
-    bookings: number;
-    earnings: number;
-    description?: string;
-    amenities?: string[];
-    propertyType?: string;
-    rules?: string;
-}
 
 const handleDeleteProperty = (propertyId: number): void => {
     setProperties(properties.filter((p: Property) => p.id !== propertyId));
 };
 
-interface Property {
-    id: number;
-    title: string;
-    location: string;
-    price: number;
-    bedrooms: number;
-    bathrooms: number;
-    guests: number;
-    rating: number;
-    reviews: number;
-    image: string;
-    status: 'active' | 'inactive';
-    bookings: number;
-    earnings: number;
-    description?: string;
-    amenities?: string[];
-    propertyType?: string;
-    rules?: string;
-}
+
 
 const handleTogglePropertyStatus = (propertyId: number): void => {
     setProperties(properties.map((p: Property) => 
@@ -203,11 +166,18 @@ const handleTogglePropertyStatus = (propertyId: number): void => {
 
   const handleAddProperty = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
+    const price = Number.parseInt(newProperty.price);
+  if (isNaN(price) || price <= 0) {
+   alert('Please enter a valid price');
+   return;
+ }
+ 
+ try {
     const property: Property = {
       id: Date.now(),
       title: newProperty.title,
       location: newProperty.location,
-      price: parseInt(newProperty.price),
+      price,
       bedrooms: newProperty.bedrooms,
       bathrooms: newProperty.bathrooms,
       guests: newProperty.guests,
@@ -225,6 +195,10 @@ const handleTogglePropertyStatus = (propertyId: number): void => {
     
     setProperties([...properties, property]);
     setShowAddPropertyModal(false);
+    } catch (error) {
+    console.error('Error adding property:', error);
+   alert('Failed to add property. Please try again.');
+ };
     setNewProperty({
       title: '',
       description: '',
@@ -352,7 +326,7 @@ const toggleDateSelection = (date: Date): void => {
         </div>
         
         <div className="flex space-x-2">
-          <button 
+          <button type="button"
             onClick={() => {
               setSelectedProperty(property);
               setShowCalendarModal(true);
@@ -362,7 +336,7 @@ const toggleDateSelection = (date: Date): void => {
             <Calendar className="w-4 h-4 mr-2" />
             Calendar
           </button>
-          <button 
+          <button  type="button"
             onClick={() => {
               setSelectedProperty(property);
               setShowPropertyModal(true);
@@ -371,13 +345,13 @@ const toggleDateSelection = (date: Date): void => {
           >
             <Edit3 className="w-4 h-4" />
           </button>
-          <button 
+          <button type="button"
             onClick={() => handleTogglePropertyStatus(property.id)}
             className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
           >
             <Eye className="w-4 h-4" />
           </button>
-          <button 
+          <button type="button"
             onClick={() => handleDeleteProperty(property.id)}
             className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors"
           >
@@ -404,7 +378,7 @@ const toggleDateSelection = (date: Date): void => {
               <h2 className="text-2xl font-bold text-gray-900">
                 Manage Calendar - {selectedProperty.title}
               </h2>
-              <button 
+              <button  type="button"
                 onClick={() => setShowCalendarModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -433,8 +407,8 @@ const toggleDateSelection = (date: Date): void => {
                   const isPast = date < today;
                   
                   return (
-                    <button
-                      key={index}
+                    <button type="button"
+                      key={date.toISOString()}
                       onClick={() => !isPast && toggleDateSelection(date)}
                       disabled={isPast}
                       className={`p-2 text-sm rounded-lg transition-colors ${
@@ -459,13 +433,13 @@ const toggleDateSelection = (date: Date): void => {
                 {selectedDates.size} dates blocked
               </div>
               <div className="space-x-3">
-                <button 
+                <button type="button"
                   onClick={() => setSelectedDates(new Set())}
                   className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
                   Clear All
                 </button>
-                <button 
+                <button type="button"
                   onClick={() => setShowCalendarModal(false)}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
@@ -503,7 +477,7 @@ const toggleDateSelection = (date: Date): void => {
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold dark:text-white text-gray-900">Add New Property</h2>
-              <button 
+              <button type="button"
                 onClick={() => setShowAddPropertyModal(false)}
                 className="text-gray-500 dark:text-white"
               >
@@ -517,8 +491,9 @@ const toggleDateSelection = (date: Date): void => {
                 <h3 className="text-lg font-semibold dark:text-white text-gray-900 mb-4">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">Property Title *</label>
+                    <label  htmlFor="propert-tittle" className="block text-sm font-medium dark:text-white text-gray-700 mb-2">Property Title *</label>
                     <input
+                        id='property-title'
                       type="text"
                       required
                       value={newProperty.title}
@@ -529,8 +504,9 @@ const toggleDateSelection = (date: Date): void => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Property Type *</label>
+                    <label  htmlFor="property" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Property Type *</label>
                     <select
+                        id='property'
                       required
                       value={newProperty.propertyType}
                       onChange={(e) => setNewProperty(prev => ({ ...prev, propertyType: e.target.value }))}
@@ -543,8 +519,9 @@ const toggleDateSelection = (date: Date): void => {
                   </div>
 
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Location *</label>
+                    <label  htmlFor="location" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Location *</label>
                     <input
+                        id='location'
                       type="text"
                       required
                       value={newProperty.location}
@@ -555,8 +532,9 @@ const toggleDateSelection = (date: Date): void => {
                   </div>
 
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Price per Night ($) *</label>
+                    <label  htmlFor="price" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Price per Night ($) *</label>
                     <input
+                        id='price'
                       type="number"
                       required
                       min="1"
@@ -568,8 +546,9 @@ const toggleDateSelection = (date: Date): void => {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Description *</label>
+                    <label  htmlFor="description" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Description *</label>
                     <textarea
+                        id='description'
                       required
                       rows={4}
                       value={newProperty.description}
@@ -586,8 +565,9 @@ const toggleDateSelection = (date: Date): void => {
                 <h3 className="text-lg font-semibold dark:text-white text-gray-900 mb-4">Property Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">Bedrooms</label>
+                    <label htmlFor='bedroom' className="block text-sm font-medium dark:text-white text-gray-700 mb-2">Bedrooms</label>
                     <select
+                        id='bedrooms'
                       value={newProperty.bedrooms}
                       onChange={(e) => setNewProperty(prev => ({ ...prev, bedrooms: parseInt(e.target.value) }))}
                       className="w-full px-3 py-2 border dark:text-white border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
@@ -599,8 +579,9 @@ const toggleDateSelection = (date: Date): void => {
                   </div>
 
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Bathrooms</label>
+                    <label  htmlFor="bathroom" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Bathrooms</label>
                     <select
+                        id='bathroom'
                       value={newProperty.bathrooms}
                       onChange={(e) => setNewProperty(prev => ({ ...prev, bathrooms: parseInt(e.target.value) }))}
                       className="w-full px-3 py-2 border dark:text-white border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
@@ -612,8 +593,9 @@ const toggleDateSelection = (date: Date): void => {
                   </div>
 
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Max Guests</label>
+                    <label htmlFor="guest" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Max Guests</label>
                     <select
+                        id='guest'
                       value={newProperty.guests}
                       onChange={(e) => setNewProperty(prev => ({ ...prev, guests: parseInt(e.target.value) }))}
                       className="w-full px-3 py-2 dark:text-white border border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
@@ -631,7 +613,7 @@ const toggleDateSelection = (date: Date): void => {
                 <h3 className="text-lg font-semibold dark:text-white text-gray-900 mb-4">Amenities</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {amenitiesList.map(amenity => (
-                    <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
+                    <label  key={amenity} className="flex items-center space-x-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={newProperty.amenities.includes(amenity)}
@@ -649,7 +631,7 @@ const toggleDateSelection = (date: Date): void => {
                 <h3 className="text-lg font-semibold dark:text-white text-gray-900 mb-4">House Rules</h3>
                 <textarea
                   rows={3}
-                
+                id='rules'
                   value={newProperty.rules}
                   onChange={(e) => setNewProperty(prev => ({ ...prev, rules: e.target.value }))}
                   className="w-full px-3 py-2 border dark:text-white border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
@@ -711,10 +693,10 @@ const toggleDateSelection = (date: Date): void => {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Host Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="text-gray-500  dark:text-white">
+              <button type="button" className="text-gray-500  dark:text-white">
                 <Bell className="w-6 h-6" />
               </button>
-              <button className="text-gray-500 dark:text-white">
+              <button type="button" className="text-gray-500 dark:text-white">
                 <Settings className="w-6 h-6" />
               </button>
               <div className="flex items-center space-x-3">
@@ -742,7 +724,7 @@ const toggleDateSelection = (date: Date): void => {
             ].map(tab => {
               const Icon = tab.icon;
               return (
-                <button
+                <button type="button"
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
@@ -770,7 +752,7 @@ const toggleDateSelection = (date: Date): void => {
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">My Properties</h2>
                 <p className="text-gray-600 dark:text-white mt-1">Manage your listings and bookings</p>
               </div>
-              <button className="bg-blue-600 text-white  px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+              <button type="button" className="bg-blue-600 text-white  px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
                 onClick={() => setShowAddPropertyModal(true)}>
                 <Plus className="w-5 h-5 mr-2" />
                 Add Property
@@ -782,6 +764,7 @@ const toggleDateSelection = (date: Date): void => {
               <div className="relative flex-1 text-black">
                 <Search className="w-5 h-5 absolute left-3 dark:text-white  top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
+                id='search'
                   type="text"
                   placeholder="Search properties..."
                   value={searchTerm}
@@ -879,7 +862,7 @@ const toggleDateSelection = (date: Date): void => {
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold dark:text-white text-gray-900">Recent Transactions</h3>
-                  <button className="text-blue-600 hover:text-blue-700 flex items-center">
+                  <button type='button' className="text-blue-600 hover:text-blue-700 flex items-center">
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </button>
@@ -945,39 +928,43 @@ const toggleDateSelection = (date: Date): void => {
                     <p className="text-gray-600 dark:text-white">{user.email}</p>
                     <p className="text-sm dark:text-white text-gray-500 mt-1">Host since {user.hostSince}</p>
                   </div>
-                  <button className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                  <button type="button" className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                     Edit Photo
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
                   <div>
-                    <label className="block text-sm  dark:text-white font-medium text-gray-700 mb-2">Full Name</label>
+                    <label htmlFor="name" className="block text-sm  dark:text-white font-medium text-gray-700 mb-2">Full Name</label>
                     <input 
+                        id='name'
                       type="text" 
                       defaultValue={user.name}
                       className="w-full px-3 py-2 dark:text-white bg-transparent border border-gray-300 rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block dark:text-white text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label htmlFor="email" className="block dark:text-white text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input 
+                        id='email'
                       type="email" 
                       defaultValue={user.email}
                       className="w-full px-3 py-2 dark:text-white border border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Phone</label>
+                    <label htmlFor="phone" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Phone</label>
                     <input 
+                        id='phone'
                       type="tel" 
                       placeholder="+1 (555) 123-4567"
                       className="w-full px-3 py-2 border dark:text-white border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Location</label>
+                    <label htmlFor="location" className="block text-sm dark:text-white font-medium text-gray-700 mb-2">Location</label>
                     <input 
+                    id='location'
                       type="text" 
                       placeholder="City, State"
                       className="w-full px-3 py-2 dark:text-white border border-gray-300 rounded-lg focus:ring-0 bg-transparent focus:ring-blue-500 focus:border-transparent"
@@ -995,7 +982,7 @@ const toggleDateSelection = (date: Date): void => {
                 </div>
 
                 <div className="mt-8 flex justify-end">
-                  <button className="bg-blue-600 dark:text-white text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                  <button type="button" className="bg-blue-600 dark:text-white text-white px-6 py-2 rounded-lg hover:bg-blue-700">
                     Save Changes
                   </button>
                 </div>
@@ -1019,7 +1006,7 @@ const toggleDateSelection = (date: Date): void => {
                   <p className="text-4xl font-bold">${mockEarnings.pendingPayouts}</p>
                   <p className="text-blue-100 mt-2">Available for withdrawal</p>
                 </div>
-                <button className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                <button type="button" className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
                   Request Payout
                 </button>
               </div>
@@ -1028,7 +1015,7 @@ const toggleDateSelection = (date: Date): void => {
               <div className="bg-white  dark:bg-[#0B1D39]/90 dark:text-white rounded-xl shadow-lg p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold dark:text-white text-gray-900">Payment Methods</h3>
-                  <button className="text-blue-600 dark:text-white hover:text-blue-700 text-sm font-medium">
+                  <button type="button" className="text-blue-600 dark:text-white hover:text-blue-700 text-sm font-medium">
                     + Add New
                   </button>
                 </div>
@@ -1057,7 +1044,7 @@ const toggleDateSelection = (date: Date): void => {
                         <p className="text-sm dark:text-white text-gray-500">Checking Account</p>
                       </div>
                     </div>
-                    <button className="text-gray-400 hover:text-gray-600">
+                    <button type="button" className="text-gray-400 hover:text-gray-600">
                       <Edit3 className="w-4 h-4" />
                     </button>
                   </div>
