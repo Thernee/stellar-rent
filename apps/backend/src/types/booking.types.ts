@@ -18,3 +18,7 @@ export const ResponseSchema = z.object({
   hostContact: z.string().email('Invalid Email'),
   escrowStatus: z.string(),
 });
+
+export const ParamsSchema = z.object({
+  bookingId: z.string().uuid({ message: 'bookingId must be a valid UUID' }),
+});
