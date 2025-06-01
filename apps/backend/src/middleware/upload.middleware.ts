@@ -20,7 +20,12 @@ export const upload = multer({
 
 // Image processing middleware
 export const processImageUploads: RequestHandler = (req, res, next) => {
-  if (!req.files || req.files.length === 0) return next();
+  if (
+    !req.files ||
+    (Array.isArray(req.files) && req.files.length === 0) ||
+    (!Array.isArray(req.files) && Object.keys(req.files).length === 0)
+  )
+    return next();
 
   const images = (req.files as Express.Multer.File[]).map((file) => {
     const base64 = file.buffer.toString('base64');

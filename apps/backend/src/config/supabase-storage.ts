@@ -26,7 +26,7 @@ export async function uploadToSupabaseStorage(
         const mimeType = header ? header.match(/data:([^;]+)/)?.[1] || 'image/jpeg' : 'image/jpeg';
         const extension = mimeType.split('/')[1] || 'jpg';
 
-        const byteCharacters = atob(base64Data || '');
+        const byteCharacters = Buffer.from(base64Data || '', 'base64').toString('binary');
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
           byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -115,10 +115,14 @@ export async function deletePropertyImagesFromStorage(propertyId: string): Promi
       .from('property-images')
       .list(propertyId);
 
-    if (listError || !files || files.length === 0) {
-      return true;
+    if (listError) {
+      console.error('Failed to list property images:', listError);
+      return false;
     }
 
+    if (!files || files.length === 0) {
+      return true;
+    }
     const filePaths = files.map((file) => `${propertyId}/${file.name}`);
 
     const { error } = await supabase.storage.from('property-images').remove(filePaths);
