@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
-import { deleteFromCloudinary, uploadToCloudinary } from '../config/cloudinary';
+import { deleteFromSupabaseStorage, uploadToSupabaseStorage } from '../config/supabase-storage';
 import {
   type PropertySearchFilters,
   type PropertySearchOptions,
@@ -66,13 +66,13 @@ function formatErrorResponse(error: string, details?: unknown): ApiResponse {
   };
 }
 
-// Image upload coordination utility
 async function coordinateImageUploads(
-  images: string[]
+  images: string[],
+  propertyId: string
 ): Promise<{ success: boolean; uploadedUrls?: string[]; error?: string }> {
   try {
-    const uploadPromises = images.map(async (image) => {
-      const uploadedUrl = await uploadToCloudinary(image);
+    const uploadPromises = images.map(async (image, index) => {
+      const uploadedUrl = await uploadToSupabaseStorage(image, propertyId, index);
       return uploadedUrl;
     });
 
@@ -81,8 +81,9 @@ async function coordinateImageUploads(
 
     const failedUploads = uploadedUrls.filter((url) => url === null);
     if (failedUploads.length > 0) {
+      // Clean up successful uploads
       const successfulUrls = uploadedUrls.filter((url) => url !== null) as string[];
-      await Promise.all(successfulUrls.map((url) => deleteFromCloudinary(url)));
+      await Promise.all(successfulUrls.map((url) => deleteFromSupabaseStorage(url)));
 
       return {
         success: false,
@@ -117,16 +118,18 @@ export async function createPropertyController(req: Request, res: Response): Pro
     }
 
     const propertyData = validationResult.data;
+    const tempPropertyId = crypto.randomUUID();
 
     // Coordinate image uploads if images are provided
     if (propertyData.images && propertyData.images.length > 0) {
-      const imageUploadResult = await coordinateImageUploads(propertyData.images);
+      const imageUploadResult = await coordinateImageUploads(propertyData.images, tempPropertyId);
       if (!imageUploadResult.success) {
         res.status(400).json(formatErrorResponse(imageUploadResult.error || 'Image upload failed'));
         return;
       }
       propertyData.images = imageUploadResult.uploadedUrls || [];
     }
+
     const propertyInput = {
       ...propertyData,
       latitude: propertyData.latitude === undefined ? null : propertyData.latitude,
@@ -185,12 +188,11 @@ export async function updatePropertyController(req: Request, res: Response): Pro
       return;
     }
 
-    // Coordinate image uploads if images are provided
     if (updateData.images && updateData.images.length > 0) {
-      const newImages = updateData.images.filter((img) => !img.includes('cloudinary.com'));
+      const newImages = updateData.images.filter((img) => !img.includes('supabase'));
 
       if (newImages.length > 0) {
-        const imageUploadResult = await coordinateImageUploads(newImages);
+        const imageUploadResult = await coordinateImageUploads(newImages, id);
         if (!imageUploadResult.success) {
           res
             .status(400)
@@ -198,7 +200,6 @@ export async function updatePropertyController(req: Request, res: Response): Pro
           return;
         }
 
-        // Replace the new image URLs with the uploaded ones
         updateData.images = updateData.images
           .map((img) => {
             if (newImages.includes(img)) {
@@ -216,11 +217,11 @@ export async function updatePropertyController(req: Request, res: Response): Pro
 
       const existingImages = existingProperty.data?.images || [];
       const removedImages = existingImages.filter(
-        (img) => !(updateData.images ?? []).includes(img) && img.includes('cloudinary.com')
+        (img) => !(updateData.images ?? []).includes(img) && img.includes('supabase')
       );
 
-      // Delete removed images from Cloudinary
-      await Promise.all(removedImages.map((img) => deleteFromCloudinary(img)));
+      // Delete removed images from Supabase Storage
+      await Promise.all(removedImages.map((img) => deleteFromSupabaseStorage(img)));
     }
     const updateInput = {
       ...updateData,
@@ -281,8 +282,8 @@ export async function deletePropertyController(req: Request, res: Response): Pro
     if (existingProperty.data?.images && existingProperty.data.images.length > 0) {
       await Promise.all(
         existingProperty.data.images
-          .filter((img) => img.includes('cloudinary.com'))
-          .map((img) => deleteFromCloudinary(img))
+          .filter((img) => img.includes('supabase'))
+          .map((img) => deleteFromSupabaseStorage(img))
       );
     }
 
