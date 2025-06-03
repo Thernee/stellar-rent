@@ -4,7 +4,6 @@ import express from 'express';
 import { errorMiddleware } from './middleware/error.middleware';
 import { rateLimiter } from './middleware/rateLimiter';
 import authRoutes from './routes/auth';
-import bookingRoutes from './routes/booking.routes';
 
 // Environment variables configuration
 dotenv.config();
@@ -31,7 +30,6 @@ app.use(rateLimiter);
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/api', bookingRoutes);
 
 // Test route
 app.get('/', (_req, res) => {
