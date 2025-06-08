@@ -34,11 +34,11 @@ export const getBookingById = async (
   const { data: hostUser, error: userError } = await supabase
     .from('users')
     .select('email')
-    .eq('id', booking.user_id)
+    .eq('id', property.owner_id)
     .single();
 
   if (userError || !hostUser) {
-    throw new Error('User (host) not found');
+    throw new Error('Host user not found');
   }
 
   const hostContact = hostUser.email;
